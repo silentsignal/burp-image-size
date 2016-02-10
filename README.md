@@ -6,7 +6,7 @@ Image size issues for Burp Suite
 Building
 --------
 
- - Install the dependencies, in case of libraries, put the JARs into `lib`
+ - (For testing) install JUnit, put the JARs into `lib`
  - Execute `ant`, and you'll have the plugin ready in `burp-image-size.jar`
 
 Dependencies
