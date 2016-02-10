@@ -8,7 +8,6 @@ import java.util.regex.*;
 import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
