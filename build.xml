@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="burp-image-size" default="plugin">
+	<target name="plugin" depends="classes">
+		<zip destfile="burp-image-size.jar">
+			<fileset dir="build">
+				<include name="burp/BurpExtender.class"/>
+				<include name="burp/ImageSizeIssue.class"/>
+				<include name="burp/SimpleImageSizeReader.class"/>
+			</fileset>
+		</zip>
+	</target>
+	<target name="test" depends="classes">
+		<java classname="org.junit.runner.JUnitCore" classpath="build">
+			<arg value="burp.ImageSizeTest"/>
+			<classpath>
+				<fileset dir="lib">
+					<include name="**/*.jar"/>
+				</fileset>
+			</classpath>
+		</java>
+	</target>
+	<target name="classes">
+		<mkdir dir="build"/>
+		<javac srcdir="src:api" destdir="build" includeantruntime="false">
+			<classpath>
+				<fileset dir="lib">
+					<include name="**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+	<target name="clean">
+		<delete dir="build"/>
+		<delete file="burp-image-size.jar"/>
+	</target>
+</project>
