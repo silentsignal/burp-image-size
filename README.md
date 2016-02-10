@@ -12,7 +12,7 @@ Building
 Dependencies
 ------------
 
- - JDK 1.7+ (tested on OpenJDK `1.7.0_85`, Debian/Ubuntu package: `openjdk-7-jdk`)
+ - JDK 1.6+ (tested on OpenJDK 6 and Oracle JDK 7 + 8, recommended Debian/Ubuntu package: `openjdk-8-jdk`)
  - Apache ANT (Debian/Ubuntu package: `ant`)
  - JUnit 4+ (only required for testing)
 
