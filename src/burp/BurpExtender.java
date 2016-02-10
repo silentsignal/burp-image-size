@@ -39,7 +39,7 @@ public class BurpExtender implements IBurpExtender, IScannerCheck
 		}
 		if (widthParam == null || heightParam == null) return null;
 		// TODO if only width or height is affected, that'd be still an issue
-		return Collections.singletonList(new ImageSizeIssue(
+		return Collections.singletonList((IScanIssue)new ImageSizeIssue(
 					baseRequestResponse, ri.getUrl(), widthParam, heightParam));
 	}
 
