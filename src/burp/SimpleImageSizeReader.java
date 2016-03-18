@@ -23,9 +23,9 @@ public class SimpleImageSizeReader {
 		}
 
 		if (first32be == 0xffd8ffe0 && // JPEG header
-				buf.getInt(6) == 0x4a464946 && // "JFIF"
+				buf.getInt(offset + 6) == 0x4a464946 && // "JFIF"
 				buf.get() == 0) {
-			buf.position(buf.getShort(4) + 4);
+			buf.position(offset + buf.getShort(offset + 4) + 4);
 			return getJfifSize(buf);
 		}
 
