@@ -16,6 +16,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class ImageSizeTest {
 
 	public static final Pattern FILENAME_RE = Pattern.compile("(\\d)+x(\\d+)");
+	public static final int OFFSET = 42;
 
 	@Parameters
 	public static Collection<Object[]> data() {
@@ -26,8 +27,9 @@ public class ImageSizeTest {
 		for (File imageFile : imageFiles) {
 			try {
 				RandomAccessFile f = new RandomAccessFile(imageFile, "r");
-				final byte[] image = new byte[(int)f.length()];
-				f.read(image);
+				int fileSize = (int)f.length();
+				final byte[] image = new byte[fileSize + OFFSET];
+				f.read(image, OFFSET, fileSize);
 				Matcher m = FILENAME_RE.matcher(imageFile.getName());
 				if (m.find()) {
 					int[] size = { Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) };
@@ -51,6 +53,6 @@ public class ImageSizeTest {
 	@Test
 	public void testGetImageSize() {
 		assertArrayEquals(size,
-				SimpleImageSizeReader.getImageSize(image, 0, image.length));
+				SimpleImageSizeReader.getImageSize(image, OFFSET, image.length - OFFSET));
 	}
 }
