@@ -5,12 +5,14 @@ import java.util.*;
 public class BurpExtender implements IBurpExtender, IScannerCheck
 {
 	IExtensionHelpers helpers;
+	IBurpExtenderCallbacks callbacks;
 
 	@Override
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks)
 	{
 		callbacks.setExtensionName("Image size issues");
 		callbacks.registerScannerCheck(this);
+		this.callbacks = callbacks;
 		this.helpers = callbacks.getHelpers();
 	}
 
@@ -39,8 +41,14 @@ public class BurpExtender implements IBurpExtender, IScannerCheck
 		}
 		if (widthParam == null || heightParam == null) return null;
 		// TODO if only width or height is affected, that'd be still an issue
+		int[]  widthMarker = { widthParam.getValueStart(),  widthParam.getValueEnd()};
+		int[] heightMarker = {heightParam.getValueStart(), heightParam.getValueEnd()};
+		List<int[]> reqMarkers = widthMarker[0] < heightMarker[0] ?
+			Arrays.asList(widthMarker, heightMarker) :
+			Arrays.asList(heightMarker, widthMarker);
 		return Collections.singletonList((IScanIssue)new ImageSizeIssue(
-					baseRequestResponse, ri.getUrl(), widthParam, heightParam));
+					callbacks.applyMarkers(baseRequestResponse, reqMarkers, null),
+					ri.getUrl(), widthParam, heightParam));
 	}
 
 	@Override
