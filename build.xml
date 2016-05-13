@@ -5,6 +5,7 @@
 			<fileset dir="build">
 				<include name="burp/BurpExtender.class"/>
 				<include name="burp/ImageSizeIssue.class"/>
+				<include name="burp/ImageTragickIssue.class"/>
 				<include name="burp/SimpleImageSizeReader.class"/>
 			</fileset>
 		</zip>

