@@ -66,24 +66,24 @@ public class BurpExtender implements IBurpExtender, IScannerCheck
 		int[] d = SimpleImageSizeReader.getImageSize(baseValue, 0, baseValue.length);
 		if (d == null) return null;
 		final IHttpService hs = baseRequestResponse.getHttpService();
-		long baseTime = measureRequest(hs, baseRequestResponse.getRequest());
-		long sleepTime = measureRequest(hs, insertionPoint.buildRequest(IMAGETRAGICK_PAYLOAD));
+		long baseTime = measureRequest(hs, baseRequestResponse.getRequest()).getKey();
+		Map.Entry<Long, IHttpRequestResponse> sleepMeasurement =
+			measureRequest(hs, insertionPoint.buildRequest(IMAGETRAGICK_PAYLOAD));
+		long sleepTime = sleepMeasurement.getKey();
 		if (Math.abs(sleepTime - baseTime - IMAGETRAGICK_SLEEP_NS)
 				> IMAGETRAGICK_TRESHOLD_NS) return null;
-		List<int[]> reqMarkers = Arrays.asList(
-				insertionPoint.getPayloadOffsets(IMAGETRAGICK_PAYLOAD));
 		IRequestInfo ri = helpers.analyzeRequest(baseRequestResponse.getHttpService(),
 				baseRequestResponse.getRequest());
 		return Collections.singletonList((IScanIssue)new ImageTragickIssue(
-					callbacks.applyMarkers(baseRequestResponse, reqMarkers, null),
-					ri.getUrl(), insertionPoint.getInsertionPointName(),
-					baseTime, sleepTime));
+					sleepMeasurement.getValue(), ri.getUrl(),
+					insertionPoint.getInsertionPointName(), baseTime, sleepTime));
 	}
 
-	private long measureRequest(IHttpService httpService, byte[] request) {
+	private Map.Entry<Long, IHttpRequestResponse> measureRequest(IHttpService httpService, byte[] request) {
 		final long startTime = System.nanoTime();
-		callbacks.makeHttpRequest(httpService, request);
-		return System.nanoTime() - startTime;
+		IHttpRequestResponse response = callbacks.makeHttpRequest(httpService, request);
+		return new AbstractMap.SimpleImmutableEntry<Long, IHttpRequestResponse>(
+				System.nanoTime() - startTime, response);
 	}
 
 	@Override
