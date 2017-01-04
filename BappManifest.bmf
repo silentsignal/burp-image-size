@@ -1,0 +1,11 @@
+Uuid: 1b602a9ae78a4ba4bc9f7b2c405a2b4e
+ExtensionType: 1
+Name: Image Size Issues
+ScreenVersion: 0.3
+SerialVersion: 1
+MinPlatformVersion: 0
+ProOnly: True
+Author: Andras Veres-Szentkiralyi
+ShortDescription: Passively detects potential denial of service attacks due to the size of an image being specified in the request parameters.
+EntryPoint: build/libs/image-size-issues-all.jar
+BuildCommand: gradle -PburpJar=$BURP_JAR fatJar

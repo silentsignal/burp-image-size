@@ -1,0 +1,24 @@
+apply plugin: 'java'
+
+dependencies {
+    compile files("$burpJar")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+	    exclude '**/*Test.java'
+        }
+    }
+}
+
+compileJava { 
+    options.encoding = "UTF-8" 
+}
+
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
