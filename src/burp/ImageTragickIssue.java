@@ -9,7 +9,7 @@ public class ImageTragickIssue implements IScanIssue {
 	private final String name;
 	private final long baseTime, sleepTime;
 
-	private static final String ISSUE_NAME = "ImageTragick (CVE-2016–3714)";
+	private static final String ISSUE_NAME = "ImageTragick (CVE-2016-3714)";
 	private static final String ISSUE_DETAIL =
 		"The time it takes for the HTTP response to arrive is <b>{1} ms</b> in case of the " +
 		"original request. However, if parameter <b>{0}</b> is replaced by an " + ISSUE_NAME + " " +
@@ -27,8 +27,8 @@ public class ImageTragickIssue implements IScanIssue {
 		"process user submitted images. The exploit for this vulnerability is being " +
 		"used in the wild.</p>" +
 		"<p>A number of image processing plugins depend on the ImageMagick library, " +
-		"including, but not limited to, PHP’s imagick, Ruby’s rmagick and paperclip, " +
-		"and nodejs’s imagemagick.</p>";
+		"including, but not limited to, PHP's imagick, Ruby's rmagick and paperclip, " +
+		"and nodejs's imagemagick.</p>";
 
 	public ImageTragickIssue(IHttpRequestResponse baseRequestResponse,
 			URL url, String name, long baseTime, long sleepTime) {
