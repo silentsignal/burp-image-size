@@ -1,0 +1,11 @@
+Uuid: 1b602a9ae78a4ba4bc9f7b2c405a2b4e
+ExtensionType: 1
+Name: Image Size Issues
+ScreenVersion: 0.3
+SerialVersion: 2
+MinPlatformVersion: 0
+ProOnly: True
+Author: Andras Veres-Szentkiralyi
+ShortDescription: Detects potential denial of service attacks in image retrieval functions.
+EntryPoint: build/libs/image-size-issues-all.jar
+BuildCommand: gradle -PburpJar=$BURP_JAR fatJar

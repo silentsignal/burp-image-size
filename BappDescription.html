@@ -1,0 +1,9 @@
+<p>This extension passively detects potential denial of service attacks due to the size of an image being specified in request parameters.</p>
+
+<p>When serving image assets, many web developers find it useful to have a feature that scales the image to a size specified in a URL parameter.
+Such functionality can not only be used for scaling images down but also making them huge, this leads to Denial of Service (DoS).</p>
+
+<p>In active scanning mode the extension also detects ImageTragick (CVE-2016–3714) in an experimental manner based on timing.</p>
+
+<p>Please refer to the <a href="https://blog.silentsignal.eu/2016/02/10/youre-not-looking-at-the-big-picture/">blog post</a> 
+for more details.</p>
