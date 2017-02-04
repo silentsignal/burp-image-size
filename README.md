@@ -11,7 +11,7 @@ plugin that can be loaded into Extender, and passively detects if the
 size of an image reply is included in the request parameters.
 
 In active scanning mode, it also detects [ImageTragick](https://imagetragick.com/)
-(CVE-2016–3714) in an experimental manner based on timing.
+(CVE-2016–3714) based on timing and using Collaborator.
 
 Read more in [our blog post about this plugin](https://blog.silentsignal.eu/2016/02/10/youre-not-looking-at-the-big-picture/)
 
